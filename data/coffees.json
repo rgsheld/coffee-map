@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T20:11:38.332Z",
+  "updatedAt": "2026-08-25T20:13:46.104Z",
   "coffees": [
     {
       "name": "Granja Paraiso 92",
@@ -46,6 +46,30 @@
       "id": "c_20260825_ewommo",
       "createdAt": "2026-08-25T20:08:11.904Z",
       "updatedAt": "2026-08-25T20:08:11.904Z"
+    },
+    {
+      "name": "Finca Liquidambar - yellow honey field blend",
+      "country": "HND",
+      "region": "San Jose La Paz, Roberto Rene Gonzalez, Finca Liquidambar",
+      "variety": [
+        "Bourbon",
+        "Catuai",
+        "Pacas"
+      ],
+      "process": "Yellow Honey",
+      "roaster": "Moonwake",
+      "flavorNotes": [
+        "banana bread",
+        "almond",
+        "pear jam"
+      ],
+      "rating": null,
+      "dateTried": "2026-08-25",
+      "altitude": 1510,
+      "notes": "",
+      "id": "c_20260825_kujrvw",
+      "createdAt": "2026-08-25T20:13:46.102Z",
+      "updatedAt": "2026-08-25T20:13:46.102Z"
     }
   ]
 }
