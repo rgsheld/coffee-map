@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T20:42:58.927Z",
+  "updatedAt": "2026-08-25T20:44:59.464Z",
   "coffees": [
     {
       "id": "c_20260825_u7fcpx",
@@ -45,7 +45,7 @@
       "altitude": 2150,
       "notes": "Brewed with Switch at ~3 weeks post roast was just beginning to get good flavor profile",
       "createdAt": "2026-08-25T20:08:11.904Z",
-      "updatedAt": "2026-08-25T20:42:58.925Z"
+      "updatedAt": "2026-08-25T20:44:59.463Z"
     },
     {
       "id": "c_20260825_kujrvw",
