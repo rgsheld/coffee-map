@@ -1,8 +1,9 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T20:13:46.104Z",
+  "updatedAt": "2026-08-25T20:42:58.927Z",
   "coffees": [
     {
+      "id": "c_20260825_u7fcpx",
       "name": "Granja Paraiso 92",
       "country": "COL",
       "region": "Cauca, Wilton Benitez",
@@ -19,14 +20,14 @@
       "dateTried": "2026-08-25",
       "altitude": null,
       "notes": "",
-      "id": "c_20260825_u7fcpx",
       "createdAt": "2026-08-25T20:11:38.330Z",
       "updatedAt": "2026-08-25T20:11:38.330Z"
     },
     {
+      "id": "c_20260825_ewommo",
       "name": "Full Spectrum",
       "country": "ETH",
-      "region": "Arbegona, Sidama, Duwancho Washing Station",
+      "region": "Arbegona, Sidama/ Duwancho Washing Station",
       "variety": [
         "74110",
         "74158"
@@ -43,11 +44,11 @@
       "dateTried": "2026-08-25",
       "altitude": 2150,
       "notes": "Brewed with Switch at ~3 weeks post roast was just beginning to get good flavor profile",
-      "id": "c_20260825_ewommo",
       "createdAt": "2026-08-25T20:08:11.904Z",
-      "updatedAt": "2026-08-25T20:08:11.904Z"
+      "updatedAt": "2026-08-25T20:42:58.925Z"
     },
     {
+      "id": "c_20260825_kujrvw",
       "name": "Finca Liquidambar - yellow honey field blend",
       "country": "HND",
       "region": "San Jose La Paz, Roberto Rene Gonzalez, Finca Liquidambar",
@@ -67,7 +68,6 @@
       "dateTried": "2026-08-25",
       "altitude": 1510,
       "notes": "",
-      "id": "c_20260825_kujrvw",
       "createdAt": "2026-08-25T20:13:46.102Z",
       "updatedAt": "2026-08-25T20:13:46.102Z"
     }
