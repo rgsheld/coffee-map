@@ -1,7 +1,28 @@
 {
   "version": 1,
-  "updatedAt": "2026-08-25T20:08:11.905Z",
+  "updatedAt": "2026-08-25T20:11:38.332Z",
   "coffees": [
+    {
+      "name": "Granja Paraiso 92",
+      "country": "COL",
+      "region": "Cauca, Wilton Benitez",
+      "variety": [
+        "Red Bourbon"
+      ],
+      "process": "Double Anaerobic Washed",
+      "roaster": "Moonwake",
+      "flavorNotes": [
+        "strawberry",
+        "hibiscus"
+      ],
+      "rating": null,
+      "dateTried": "2026-08-25",
+      "altitude": null,
+      "notes": "",
+      "id": "c_20260825_u7fcpx",
+      "createdAt": "2026-08-25T20:11:38.330Z",
+      "updatedAt": "2026-08-25T20:11:38.330Z"
+    },
     {
       "name": "Full Spectrum",
       "country": "ETH",
