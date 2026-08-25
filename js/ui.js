@@ -3,7 +3,7 @@
  * This module knows nothing about GitHub — it takes data and callbacks.
  */
 
-import { FACETS, averageRating } from './filters.js';
+import { FACETS, averageRating, components, countryNameOf } from './filters.js?v=2';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const CHIP_LIMIT = 10;          // collapse long facets; roasters especially
@@ -85,33 +85,52 @@ function stars(rating) {
  * light up exactly the tags that caused this coffee to match — so it's obvious
  * *why* a country is highlighted.
  */
-export function coffeeCard(coffee, { matchedValues, dimmed, onEdit, onDelete, canEdit }) {
+export function coffeeCard(coffee, { matchedValues, dimmed, onEdit, onDelete, canEdit, hideCountry }) {
   const card = document.createElement('article');
   card.className = 'card' + (dimmed ? ' dimmed' : '');
 
   const isMatch = (v) => matchedValues && matchedValues.has(v);
   const tag = (value, extra = '') =>
-    `<span class="tag ${extra}${isMatch(value) ? ' match' : ''}">${escapeHtml(label('', value))}</span>`;
+    `<span class="tag ${extra}${isMatch(value) ? ' match' : ''}">${escapeHtml(value)}</span>`;
 
-  const tags = [
-    ...coffee.variety.map((v) => tag(v, 'variety')),
-    coffee.process ? tag(coffee.process) : '',
-    ...coffee.flavorNotes.map((v) => tag(v)),
-  ].filter(Boolean).join('');
+  const comps = components(coffee);
+  const blend = comps.length > 1;
 
-  const meta = [
-    coffee.region && `${escapeHtml(coffee.region)}`,
-    coffee.altitude && `${coffee.altitude} masl`,
-    coffee.dateTried && formatDate(coffee.dateTried),
-  ].filter(Boolean).map((m) => `<span>${m}</span>`).join('');
+  /* In the country panel the heading already names the country, so repeating it on
+     every card is noise — but a blend has to name each origin or the rows are
+     ambiguous. */
+  const originRow = (comp) => {
+    const showCountry = blend || !hideCountry;
+    const place = [showCountry ? countryNameOf(comp.country) : '', comp.region, comp.producer]
+      .filter(Boolean).join(' · ');
+    const aside = [comp.share ? `${comp.share}%` : '', comp.altitude ? `${comp.altitude} masl` : '']
+      .filter(Boolean).join(' · ');
+    const tags = [
+      ...comp.variety.map((v) => tag(v, 'variety')),
+      comp.process ? tag(comp.process) : '',
+    ].filter(Boolean).join('');
+    if (!place && !tags && !aside) return '';
+    return `<li class="origin">
+        ${place || aside ? `<div class="origin-place"><span>${escapeHtml(place)}</span>` +
+          `${aside ? `<span class="origin-extra">${escapeHtml(aside)}</span>` : ''}</div>` : ''}
+        ${tags ? `<div class="tags">${tags}</div>` : ''}
+      </li>`;
+  };
+
+  const origins = comps.map(originRow).filter(Boolean).join('');
+  const notes = coffee.flavorNotes.map((v) => tag(v)).join('');
+
+  const meta = [coffee.dateTried && formatDate(coffee.dateTried)]
+    .filter(Boolean).map((m) => `<span>${m}</span>`).join('');
 
   card.innerHTML = `
     <div class="card-top">
-      <h3>${escapeHtml(coffee.name)}</h3>
+      <h3>${escapeHtml(coffee.name)}${blend ? '<span class="blend-badge">blend</span>' : ''}</h3>
       ${coffee.rating ? `<span class="stars" title="${coffee.rating} out of 5">${stars(coffee.rating)}</span>` : ''}
     </div>
     ${coffee.roaster ? `<p class="roaster">${escapeHtml(coffee.roaster)}</p>` : ''}
-    ${tags ? `<div class="tags">${tags}</div>` : ''}
+    ${origins ? `<ul class="origins-list${blend ? ' blend' : ''}">${origins}</ul>` : ''}
+    ${notes ? `<div class="tags flavour">${notes}</div>` : ''}
     ${coffee.notes ? `<p class="notes">${escapeHtml(coffee.notes)}</p>` : ''}
     ${meta ? `<div class="card-meta">${meta}</div>` : ''}
   `;
@@ -173,6 +192,7 @@ export function renderPanel({ iso, name, coffees, matchedIds, matchedValues, fil
     body.append(coffeeCard(coffee, {
       matchedValues,
       dimmed: filtering && !matchedIds.has(coffee.id),
+      hideCountry: true,
       onEdit, onDelete, canEdit,
     }));
   }
@@ -182,6 +202,85 @@ export function renderPanel({ iso, name, coffees, matchedIds, matchedValues, fil
 
 const listFrom = (value) => String(value || '').split(',').map((s) => s.trim()).filter(Boolean);
 
+const blank = () =>
+  ({ country: '', region: '', producer: '', variety: [], process: '', altitude: null, share: null });
+
+const numOrNull = (v) => (String(v).trim() === '' ? null : Number(v));
+
+/** One origin row. Share is only offered on a blend, where it means something. */
+function componentRow(comp, index, { countries, showShare, removable, onRemove }) {
+  const row = document.createElement('fieldset');
+  row.className = 'component';
+  row.innerHTML = `
+    <div class="component-head"><span class="component-title">Origin ${index + 1}</span></div>
+    <div class="component-grid">
+      <div class="field">
+        <label>Country <span class="req">*</span></label>
+        <select class="c-country">
+          <option value="">Choose a country…</option>
+          ${countries.map((c) => `<option value="${c.iso}">${escapeHtml(c.name)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Region</label>
+        <input class="c-region" list="dl-region" placeholder="e.g. Yirgacheffe" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Producer / farm</label>
+        <input class="c-producer" list="dl-producer" placeholder="e.g. Finca Milán" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Variety <span class="hint">comma-separated</span></label>
+        <input class="c-variety" list="dl-variety" placeholder="e.g. Gesha" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Process</label>
+        <input class="c-process" list="dl-process" placeholder="e.g. Washed" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Altitude <span class="hint">masl</span></label>
+        <input class="c-altitude" type="number" min="0" max="4000" step="10" placeholder="2100">
+      </div>
+      ${showShare ? `<div class="field">
+        <label>Share <span class="hint">%</span></label>
+        <input class="c-share" type="number" min="0" max="100" step="5" placeholder="60">
+      </div>` : ''}
+    </div>
+  `;
+
+  row.querySelector('.c-country').value  = comp.country || '';
+  row.querySelector('.c-region').value   = comp.region || '';
+  row.querySelector('.c-producer').value = comp.producer || '';
+  row.querySelector('.c-variety').value  = (comp.variety || []).join(', ');
+  row.querySelector('.c-process').value  = comp.process || '';
+  row.querySelector('.c-altitude').value = comp.altitude != null ? String(comp.altitude) : '';
+  if (showShare) row.querySelector('.c-share').value = comp.share != null ? String(comp.share) : '';
+
+  if (removable) {
+    const kill = document.createElement('button');
+    kill.type = 'button';
+    kill.className = 'icon-btn remove-origin';
+    kill.setAttribute('aria-label', `Remove origin ${index + 1}`);
+    kill.innerHTML = '&times;';
+    kill.addEventListener('click', onRemove);
+    row.querySelector('.component-head').append(kill);
+  }
+  return row;
+}
+
+function readRow(row) {
+  const val = (sel) => { const el = row.querySelector(sel); return el ? el.value : ''; };
+  return {
+    country:  val('.c-country'),
+    region:   val('.c-region').trim(),
+    producer: val('.c-producer').trim(),
+    variety:  listFrom(val('.c-variety')),
+    process:  val('.c-process').trim(),
+    altitude: numOrNull(val('.c-altitude')),
+    share:    numOrNull(val('.c-share')),
+  };
+}
+
 export function openCoffeeForm({ coffee, countryIso, countries, suggestions, onSave, onDelete }) {
   const dlg = $('#dlg-coffee');
   const editing = Boolean(coffee);
@@ -189,62 +288,80 @@ export function openCoffeeForm({ coffee, countryIso, countries, suggestions, onS
   $('#coffee-form-title').textContent = editing ? 'Edit coffee' : 'Add a coffee';
   $('#form-error').hidden = true;
 
-  const select = $('#f-country');
-  select.innerHTML = '<option value="">Choose a country…</option>' +
-    countries.map((c) => `<option value="${c.iso}">${escapeHtml(c.name)}</option>`).join('');
-
   fillDatalist('#dl-variety', suggestions.variety);
   fillDatalist('#dl-process', unionWith(suggestions.process,
     ['Washed', 'Natural', 'Honey', 'Anaerobic', 'Carbonic Maceration', 'Wet-hulled', 'Yeast Inoculated']));
   fillDatalist('#dl-roaster', suggestions.roaster);
   fillDatalist('#dl-flavor', suggestions.flavorNotes);
   fillDatalist('#dl-region', suggestions.region);
+  fillDatalist('#dl-producer', suggestions.producer);
 
-  $('#f-name').value      = coffee ? coffee.name : '';
-  select.value            = coffee ? coffee.country : (countryIso || '');
-  $('#f-region').value    = coffee ? coffee.region : '';
-  $('#f-variety').value   = coffee ? coffee.variety.join(', ') : '';
-  $('#f-process').value   = coffee ? coffee.process : '';
-  $('#f-roaster').value   = coffee ? coffee.roaster : '';
-  $('#f-flavor').value    = coffee ? coffee.flavorNotes.join(', ') : '';
-  $('#f-rating').value    = coffee && coffee.rating != null ? String(coffee.rating) : '';
-  $('#f-date').value      = coffee ? coffee.dateTried : new Date().toISOString().slice(0, 10);
-  $('#f-altitude').value  = coffee && coffee.altitude != null ? String(coffee.altitude) : '';
-  $('#f-notes').value     = coffee ? coffee.notes : '';
+  // Live working copy of the origins; the DOM is re-read before every structural change
+  // so half-typed values survive adding or removing a row.
+  let comps = coffee && coffee.components.length
+    ? coffee.components.map((c) => ({ ...c }))
+    : [{ ...blank(), country: countryIso || '' }];
+
+  const host = $('#components');
+  const sync = () => { comps = [...host.querySelectorAll('.component')].map(readRow); };
+
+  function renderRows() {
+    host.innerHTML = '';
+    const showShare = comps.length > 1;
+    comps.forEach((comp, i) => host.append(componentRow(comp, i, {
+      countries,
+      showShare,
+      removable: comps.length > 1,
+      onRemove: () => { sync(); comps.splice(i, 1); renderRows(); },
+    })));
+  }
+  renderRows();
+
+  $('#f-name').value    = coffee ? coffee.name : '';
+  $('#f-roaster').value = coffee ? coffee.roaster : '';
+  $('#f-flavor').value  = coffee ? coffee.flavorNotes.join(', ') : '';
+  $('#f-rating').value  = coffee && coffee.rating != null ? String(coffee.rating) : '';
+  $('#f-date').value    = coffee ? coffee.dateTried : new Date().toISOString().slice(0, 10);
+  $('#f-notes').value   = coffee ? coffee.notes : '';
 
   $('#btn-delete-coffee').hidden = !editing;
 
-  const collect = () => ({
-    ...(coffee || {}),
-    name: $('#f-name').value.trim(),
-    country: select.value,
-    region: $('#f-region').value.trim(),
-    variety: listFrom($('#f-variety').value),
-    process: $('#f-process').value.trim(),
-    roaster: $('#f-roaster').value.trim(),
-    flavorNotes: listFrom($('#f-flavor').value),
-    rating: $('#f-rating').value ? Number($('#f-rating').value) : null,
-    dateTried: $('#f-date').value,
-    altitude: $('#f-altitude').value ? Number($('#f-altitude').value) : null,
-    notes: $('#f-notes').value.trim(),
-  });
+  const collect = () => {
+    sync();
+    return {
+      ...(coffee || {}),
+      name: $('#f-name').value.trim(),
+      roaster: $('#f-roaster').value.trim(),
+      flavorNotes: listFrom($('#f-flavor').value),
+      rating: $('#f-rating').value ? Number($('#f-rating').value) : null,
+      dateTried: $('#f-date').value,
+      notes: $('#f-notes').value.trim(),
+      components: comps,
+    };
+  };
 
-  const fail = (message, focusSel) => {
+  const fail = (message, focusEl) => {
     const box = $('#form-error');
     box.textContent = message;
     box.hidden = false;
-    $(focusSel).focus();
+    if (focusEl) focusEl.focus();
   };
 
   const save = () => {
     const draft = collect();
-    if (!draft.name)    return fail('Give the coffee a name.', '#f-name');
-    if (!draft.country) return fail('Pick a country of origin.', '#f-country');
+    if (!draft.name) return fail('Give the coffee a name.', $('#f-name'));
+    const missing = draft.components.findIndex((c) => !c.country);
+    if (missing !== -1) {
+      return fail(draft.components.length > 1
+        ? `Pick a country for origin ${missing + 1}.`
+        : 'Pick a country of origin.', host.querySelectorAll('.c-country')[missing]);
+    }
     dlg.close();
     onSave(draft);
   };
 
   // Rebind fresh each open so a previous dialog's closure can't fire twice.
+  bindOnce($('#btn-add-component'), 'click', () => { sync(); comps.push(blank()); renderRows(); });
   bindOnce($('#btn-save-coffee'), 'click', save);
   bindOnce($('#btn-cancel-coffee'), 'click', () => dlg.close());
   bindOnce($('#btn-delete-coffee'), 'click', () => { dlg.close(); onDelete(coffee); });
@@ -252,7 +369,10 @@ export function openCoffeeForm({ coffee, countryIso, countries, suggestions, onS
   bindOnce($('#f-name'), 'keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); save(); } });
 
   dlg.showModal();
-  setTimeout(() => $(editing ? '#f-name' : (countryIso ? '#f-name' : '#f-country')).focus(), 30);
+  setTimeout(() => {
+    const first = editing || countryIso ? $('#f-name') : host.querySelector('.c-country');
+    if (first) first.focus();
+  }, 30);
 }
 
 /** Replace any handler added by a previous open, avoiding stacked listeners. */
@@ -274,13 +394,16 @@ const unionWith = (set, extra) => new Set([...set, ...extra]);
  *  consistent, which matters because facets group on exact strings. */
 export function buildSuggestions(coffees) {
   const out = { variety: new Set(), process: new Set(), roaster: new Set(),
-                flavorNotes: new Set(), region: new Set() };
+                flavorNotes: new Set(), region: new Set(), producer: new Set() };
   for (const c of coffees) {
-    c.variety.forEach((v) => out.variety.add(v));
     c.flavorNotes.forEach((v) => out.flavorNotes.add(v));
-    if (c.process) out.process.add(c.process);
     if (c.roaster) out.roaster.add(c.roaster);
-    if (c.region) out.region.add(c.region);
+    for (const comp of components(c)) {
+      comp.variety.forEach((v) => out.variety.add(v));
+      if (comp.process)  out.process.add(comp.process);
+      if (comp.region)   out.region.add(comp.region);
+      if (comp.producer) out.producer.add(comp.producer);
+    }
   }
   return out;
 }

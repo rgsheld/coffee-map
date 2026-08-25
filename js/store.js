@@ -10,7 +10,7 @@
  * unlimited, while anonymous API calls are capped at 60/hour per IP.
  */
 
-import * as gh from './github.js';
+import * as gh from './github.js?v=2';
 
 export const DATA_PATH = 'data/coffees.json';
 const DEFAULT_REPO = 'rgsheld/coffee-map';
@@ -80,31 +80,98 @@ export function forgetToken() {
 
 /* ------------------------------------------------------------------ shape */
 
+/**
+ * Coerce a stored document into the shape the app expects, migrating v1 on the way.
+ *
+ * v1 kept country/region/variety/process/altitude flat on the coffee, which cannot
+ * express a blend: two origins, each with its own process. v2 moves those onto a
+ * `components` list and keeps only what belongs to the cup as drunk (name, roaster,
+ * rating, flavour notes, date, free notes) at the top level.
+ */
 function normalise(doc) {
   const list = Array.isArray(doc) ? doc : (doc && Array.isArray(doc.coffees) ? doc.coffees : []);
-  return list.filter(Boolean).map((c) => ({
-    id: c.id || newId(),
-    name: str(c.name),
-    country: str(c.country).toUpperCase().slice(0, 3),
-    region: str(c.region),
-    variety: arr(c.variety),
-    process: str(c.process),
-    roaster: str(c.roaster),
-    flavorNotes: arr(c.flavorNotes ?? c.flavourNotes ?? c.notes_flavor),
-    rating: c.rating === '' || c.rating == null ? null : Number(c.rating),
-    dateTried: str(c.dateTried),
-    altitude: c.altitude === '' || c.altitude == null ? null : Number(c.altitude),
-    notes: str(c.notes),
-    // Kept so the seeded examples stay one click away from being cleared.
-    ...(c.sample === true ? { sample: true } : {}),
-    createdAt: c.createdAt || new Date().toISOString(),
-    updatedAt: c.updatedAt || c.createdAt || new Date().toISOString(),
+  return list.filter(Boolean).map((c) => {
+    // Pull the v1 flat keys out so they don't linger as dead weight, but spread the
+    // rest: serialise() rewrites the whole file, so any field this version doesn't
+    // know about would otherwise be stripped from every coffee by an older client
+    // still running cached JavaScript.
+    const { country, region, producer, variety, process, altitude, components, ...rest } = c;
+    return {
+      ...rest,
+      id: c.id || newId(),
+      name: str(c.name),
+      roaster: str(c.roaster),
+      flavorNotes: arr(c.flavorNotes ?? c.flavourNotes ?? c.notes_flavor),
+      rating: num(c.rating),
+      dateTried: str(c.dateTried),
+      notes: str(c.notes),
+      components: componentsOf(c),
+      // Kept so the seeded examples stay one click away from being cleared.
+      ...(c.sample === true ? { sample: true } : {}),
+      createdAt: c.createdAt || new Date().toISOString(),
+      updatedAt: c.updatedAt || c.createdAt || new Date().toISOString(),
+    };
+  });
+}
+
+export function blankComponent() {
+  return { country: '', region: '', producer: '', variety: [], process: '', altitude: null, share: null };
+}
+
+function normaliseComponent(x) {
+  const { country, region, producer, variety, process, altitude, share, ...rest } = x || {};
+  return {
+    ...rest,
+    country: str(country).toUpperCase().slice(0, 3),
+    region: str(region),
+    producer: str(producer),
+    variety: arr(variety),
+    process: str(process),
+    altitude: num(altitude),
+    share: num(share),
+  };
+}
+
+const hasContent = (x) =>
+  Boolean(x.country || x.region || x.producer || x.process || x.variety.length);
+
+/** Always returns at least one component, so the form and cards never special-case empty. */
+function componentsOf(c) {
+  if (Array.isArray(c.components) && c.components.length) {
+    const list = c.components.filter(Boolean).map(normaliseComponent).filter(hasContent);
+    if (list.length) return list;
+  }
+  return migrateFlat(c);
+}
+
+/** v1 -> v2. A v1 `process` of "honey, washed" was one opaque string that matched
+ *  neither facet; splitting it recovers a real blend. Varieties pair positionally
+ *  when the counts line up, which is how people write them ("Gesha, Caturra" /
+ *  "Natural, Washed"); otherwise every component carries the full list for you to
+ *  correct by hand. */
+function migrateFlat(c) {
+  const processes = arr(c.process);
+  const variety   = arr(c.variety);
+  const base = { country: c.country, region: c.region, producer: c.producer, altitude: c.altitude };
+
+  if (processes.length <= 1) {
+    return [normaliseComponent({ ...base, variety, process: processes[0] || '' })];
+  }
+  return processes.map((process, i) => normaliseComponent({
+    ...base,
+    process,
+    variety: variety.length === processes.length ? [variety[i]] : variety,
   }));
 }
 
 const str = (v) => (v == null ? '' : String(v).trim());
 const arr = (v) => (Array.isArray(v) ? v : String(v ?? '').split(','))
   .map((s) => String(s).trim()).filter(Boolean);
+const num = (v) => {
+  if (v === '' || v == null) return null;
+  const n = Number(v);
+  return Number.isNaN(n) ? null : n;
+};
 
 export function newId() {
   const rand = Math.random().toString(36).slice(2, 8);
@@ -112,9 +179,11 @@ export function newId() {
 }
 
 function serialise(coffees) {
+  const key = (c) => (Array.isArray(c.components) && c.components[0]
+    ? c.components[0].country || '' : '');
   const sorted = [...coffees].sort((a, b) =>
-    a.country.localeCompare(b.country) || a.name.localeCompare(b.name));
-  return JSON.stringify({ version: 1, updatedAt: new Date().toISOString(), coffees: sorted }, null, 2) + '\n';
+    key(a).localeCompare(key(b)) || String(a.name).localeCompare(String(b.name)));
+  return JSON.stringify({ version: 2, updatedAt: new Date().toISOString(), coffees: sorted }, null, 2) + '\n';
 }
 
 /* ------------------------------------------------------------------ load */

@@ -83,6 +83,16 @@ To put it on your phone home screen: Safari → Share → *Add to Home Screen*.
   (`Gesha` + `Natural` = naturally-processed Geshas only).
 - **Shade by** switches the map between number tried and average rating.
 - **`/`** focuses the search box. **Esc** closes panels.
+- **Blends** are first-class. A coffee holds one or more *origins*; hit **+ Add origin**
+  in the form to add another. Each origin carries its own country, region, producer,
+  variety, process, altitude and share, because those travel together — the Gesha half
+  is the natural one, the Caturra half is the washed one.
+- A blend is listed under every country it draws on, and counts toward each. Filtering
+  lights up only the origin that actually matched: filter on `Gesha` and a Brazil/Ethiopia
+  blend highlights just the country that grew the Gesha.
+- Because origins are kept whole, `Gesha` + `Washed` matches only a coffee where one
+  origin is *both*. A flat list of varieties and processes would report a natural Gesha
+  blended with a washed Caturra as a washed Gesha, which it never was.
 - Variety and flavour notes are comma-separated, and every text field autocompletes from
   what you've already entered — worth accepting the suggestion so the filters group
   cleanly (`Gesha` and `Geisha` would otherwise be two separate chips).
@@ -132,6 +142,27 @@ js/vendor/            Leaflet 1.9.4, vendored so there are no CDN dependencies
 data/coffees.json     your coffees
 data/countries.geo.json  world country polygons, keyed by ISO alpha-3
 ```
+
+### Data shape
+
+`data/coffees.json` is `{ version: 2, updatedAt, coffees: [...] }`. Each coffee keeps what
+belongs to the cup as drunk — `name`, `roaster`, `flavorNotes`, `rating`, `dateTried`,
+`notes` — plus a `components` array. Each component is one origin: `country` (ISO alpha-3),
+`region`, `producer`, `variety[]`, `process`, `altitude`, `share`.
+
+Version 1 kept `country`/`region`/`variety`/`process`/`altitude` flat on the coffee and is
+migrated automatically on load, so an old file still opens. A v1 `process` of
+`"honey, washed"` is split into one component per process, pairing varieties positionally
+when the counts line up — check those entries once after upgrading.
+
+Two rules worth keeping if you edit the code:
+
+- `normalise()` in `js/store.js` spreads the original object before coercing fields, so a
+  field a newer version adds is not stripped by an older browser tab still running cached
+  JavaScript. `serialise()` rewrites the whole file on every save, so without that spread
+  one stale tab would silently drop a column from every coffee.
+- `index.html` and the `import` statements carry a `?v=N` query string. Bump **all of them
+  together** when you deploy, or a fresh `app.js` can pull a stale `store.js`.
 
 The map draws no tile layer — just country polygons on a flat background. That means the
 page makes no third-party requests at all, works offline, and stays quick on a phone.

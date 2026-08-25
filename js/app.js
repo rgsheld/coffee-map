@@ -3,11 +3,12 @@
  * everything else from the store on each render, and pushes it to the map and DOM.
  */
 
-import * as store from './store.js';
-import * as mapView from './map.js';
-import * as ui from './ui.js';
+import * as store from './store.js?v=2';
+import * as mapView from './map.js?v=2';
+import * as ui from './ui.js?v=2';
 import { buildFacets, applyFilters, byCountry, averageRating, emptyFilters,
-         hasActiveFilters, setCountryNameResolver, FACETS } from './filters.js';
+         hasActiveFilters, setCountryNameResolver, matchingCountries, countriesOf,
+         FACETS } from './filters.js?v=2';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -35,7 +36,13 @@ function derive() {
     if (avg != null) ratings.set(iso, avg);
   }
 
-  const matched = filtering ? new Set(filtered.map((c) => c.country)) : null;
+  let matched = null;
+  if (filtering) {
+    // A blend lights up only the origin responsible for the match: filtering on
+    // "Gesha" highlights the country that grew the Gesha, not its washed partner.
+    matched = new Set();
+    for (const c of filtered) for (const iso of matchingCountries(c, view.filters)) matched.add(iso);
+  }
   const matchedIds = new Set(filtered.map((c) => c.id));
   const matchedValues = new Set();
   for (const facet of FACETS) for (const v of view.filters[facet.key]) matchedValues.add(v);
@@ -154,8 +161,8 @@ function addCoffee(countryIso) {
     suggestions: suggestions(),
     onSave: (draft) => commit(
       store.upsert(stamp({ ...draft, id: store.newId(), createdAt: new Date().toISOString() })),
-      `Add ${draft.name} (${draft.country})`,
-      () => { view.selected = draft.country; $('#panel').hidden = false; },
+      `Add ${draft.name} (${isoLabel(draft)})`,
+      () => { view.selected = countriesOf(draft)[0] || view.selected; $('#panel').hidden = false; },
     ),
     onDelete: () => {},
   });
@@ -164,13 +171,17 @@ function addCoffee(countryIso) {
 function editCoffee(coffee) {
   ui.openCoffeeForm({
     coffee,
-    countryIso: coffee.country,
+    countryIso: countriesOf(coffee)[0] || '',
     countries: view.countries,
     suggestions: suggestions(),
     onSave: (draft) => commit(
       store.upsert(stamp(draft)),
-      `Update ${draft.name} (${draft.country})`,
-      () => { if (draft.country !== coffee.country) view.selected = draft.country; },
+      `Update ${draft.name} (${isoLabel(draft)})`,
+      () => {
+        // Keep the panel on a country the coffee still belongs to.
+        const origins = countriesOf(draft);
+        if (!origins.includes(view.selected)) view.selected = origins[0] || view.selected;
+      },
     ),
     onDelete: (c) => deleteCoffee(c),
   });
@@ -178,10 +189,13 @@ function editCoffee(coffee) {
 
 function deleteCoffee(coffee) {
   if (!confirm(`Delete "${coffee.name}"? This commits the removal, so you can still recover it from the repo history.`)) return;
-  commit(store.remove(coffee.id), `Remove ${coffee.name} (${coffee.country})`);
+  commit(store.remove(coffee.id), `Remove ${coffee.name} (${isoLabel(coffee)})`);
 }
 
 const stamp = (c) => ({ ...c, updatedAt: new Date().toISOString() });
+
+/** "ETH+COL" for a blend, so the commit log stays readable at a glance. */
+const isoLabel = (c) => countriesOf(c).join('+') || '??';
 
 /** Apply a store operation, then reflect the outcome in the UI. */
 async function commit(operation, message, before) {

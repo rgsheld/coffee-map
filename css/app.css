@@ -328,6 +328,47 @@ dialog form { display: contents; }
 .sheet-grip { display: none; }
 
 /* ---------------------------------------------------------------- mobile */
+/* ------------------------------------------------------------------ origins */
+
+/* Card: one row per origin. A single-origin coffee reads as a plain line; a blend
+   gets a left rule so the components are visibly one group. */
+.origins-list { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.origins-list.blend { gap: 10px; border-left: 2px solid var(--border); padding-left: 10px; }
+.origin-place {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  font-size: 13px; color: var(--text);
+}
+.origin-extra { color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.origins-list .tags { margin-top: 5px; }
+.card .tags.flavour { margin-top: 8px; }
+.blend-badge {
+  margin-left: 6px; padding: 1px 6px; border-radius: 999px; font-size: 10.5px;
+  font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  background: var(--accent-soft); color: var(--accent); vertical-align: middle;
+}
+
+/* Form: repeatable origin fieldsets */
+.origins-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.origins-head .hint { font-size: 12px; color: var(--muted); }
+#components { display: flex; flex-direction: column; gap: 10px; margin: 8px 0; }
+.component {
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 8px 12px 12px; margin: 0; background: var(--surface);
+}
+.component-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.component-title {
+  font-size: 11.5px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .05em;
+}
+.component-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.remove-origin {
+  margin-left: auto; width: 28px; height: 28px; flex: none;
+  font-size: 17px; line-height: 1; color: var(--muted);
+}
+.remove-origin:hover { color: var(--danger); }
+.add-origin { align-self: start; }
+
+
 @media (max-width: 860px) {
   .only-mobile { display: grid; }
   .only-desktop { display: none; }
@@ -366,6 +407,7 @@ dialog form { display: contents; }
   .legend { bottom: 12px; left: 10px; font-size: 11px; }
   .legend .sw { width: 21px; }
   .dlg-body { grid-template-columns: 1fr; }
+  .component-grid { grid-template-columns: 1fr; }
   dialog { width: 100vw; max-width: 100vw; max-height: 92dvh; border-radius: 16px 16px 0 0;
            margin: auto auto 0; }
   .card-actions .btn { min-height: 36px; }
