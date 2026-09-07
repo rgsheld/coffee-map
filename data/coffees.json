@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-07T16:46:57.122Z",
+  "updatedAt": "2026-09-07T16:47:11.346Z",
   "coffees": [
     {
       "id": "c_20260825_u7fcpx",
@@ -64,12 +64,12 @@
         "almond",
         "pear jam"
       ],
-      "rating": null,
+      "rating": 2,
       "dateTried": "2026-08-25",
       "altitude": 1510,
       "notes": "Switch. Bitter and tasted over-roasted \"diner style\"",
       "createdAt": "2026-08-25T20:13:46.102Z",
-      "updatedAt": "2026-09-07T16:46:57.109Z"
+      "updatedAt": "2026-09-07T16:47:11.339Z"
     }
   ]
 }
