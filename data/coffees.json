@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-07T16:47:11.346Z",
+  "updatedAt": "2026-09-07T17:41:30.917Z",
   "coffees": [
     {
       "id": "c_20260825_u7fcpx",
@@ -16,12 +16,12 @@
         "strawberry",
         "hibiscus"
       ],
-      "rating": null,
+      "rating": 4,
       "dateTried": "2026-08-25",
       "altitude": null,
-      "notes": "",
+      "notes": "Switch. Had an odd tannic mouth feel but smooth deep sweetness (@ 2 weeks)",
       "createdAt": "2026-08-25T20:11:38.330Z",
-      "updatedAt": "2026-08-25T20:11:38.330Z"
+      "updatedAt": "2026-09-07T17:41:30.909Z"
     },
     {
       "id": "c_20260825_ewommo",
