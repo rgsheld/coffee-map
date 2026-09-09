@@ -1,7 +1,30 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-07T17:41:30.917Z",
+  "updatedAt": "2026-09-09T16:26:52.494Z",
   "coffees": [
+    {
+      "name": "Hills of Heza",
+      "country": "BDI",
+      "region": "Kayanza",
+      "variety": [
+        "Red Bourbon"
+      ],
+      "process": "Washed",
+      "roaster": "Loveless Coffees",
+      "flavorNotes": [
+        "Molasses",
+        "citrus",
+        "raisin",
+        "earl grey"
+      ],
+      "rating": null,
+      "dateTried": "2026-09-09",
+      "altitude": 2100,
+      "notes": "",
+      "id": "c_20260909_i13jdf",
+      "createdAt": "2026-09-09T16:26:52.475Z",
+      "updatedAt": "2026-09-09T16:26:52.475Z"
+    },
     {
       "id": "c_20260825_u7fcpx",
       "name": "Granja Paraiso 92",
