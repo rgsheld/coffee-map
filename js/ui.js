@@ -3,7 +3,9 @@
  * This module knows nothing about GitHub — it takes data and callbacks.
  */
 
-import { FACETS, averageRating, components, countryNameOf } from './filters.js?v=2';
+import { FACETS, averageRating, components, countryNameOf, countriesOf,
+         isRatingFacet } from './filters.js?v=4';
+import { RATERS, scoreOf, raterLabel } from './raters.js?v=4';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const CHIP_LIMIT = 10;          // collapse long facets; roasters especially
@@ -69,7 +71,7 @@ export function renderFacets(container, facets, filters, onToggle) {
   }
 }
 
-const label = (key, value) => (key === 'rating' ? `${value} ★` : value);
+const label = (key, value) => (isRatingFacet(key) ? `${value} ★` : value);
 
 /* ------------------------------------------------------------------ cards */
 
@@ -126,7 +128,7 @@ export function coffeeCard(coffee, { matchedValues, dimmed, onEdit, onDelete, ca
   card.innerHTML = `
     <div class="card-top">
       <h3>${escapeHtml(coffee.name)}${blend ? '<span class="blend-badge">blend</span>' : ''}</h3>
-      ${coffee.rating ? `<span class="stars" title="${coffee.rating} out of 5">${stars(coffee.rating)}</span>` : ''}
+      ${scoreBadges(coffee)}
     </div>
     ${coffee.roaster ? `<p class="roaster">${escapeHtml(coffee.roaster)}</p>` : ''}
     ${origins ? `<ul class="origins-list${blend ? ' blend' : ''}">${origins}</ul>` : ''}
@@ -154,6 +156,17 @@ export function coffeeCard(coffee, { matchedValues, dimmed, onEdit, onDelete, ca
   return card;
 }
 
+/** A badge per rater who scored it. People who haven't rated it are simply absent,
+ *  which keeps a one-person coffee looking the same as it always did. */
+function scoreBadges(coffee) {
+  return RATERS.map((r) => {
+    const v = scoreOf(coffee, r.id);
+    if (v == null) return '';
+    return `<span class="score" title="${escapeHtml(r.label)} rated this ${v} out of 5">` +
+           `<b>${escapeHtml(r.label)}</b><span class="stars">${stars(v)}</span></span>`;
+  }).filter(Boolean).join('');
+}
+
 function formatDate(iso) {
   const d = new Date(`${iso}T00:00:00`);
   if (Number.isNaN(d.getTime())) return escapeHtml(iso);
@@ -165,9 +178,11 @@ function formatDate(iso) {
 export function renderPanel({ iso, name, coffees, matchedIds, matchedValues, filtering,
                               onEdit, onDelete, canEdit }) {
   $('#panel-title').textContent = name;
-  const avg = averageRating(coffees);
   const bits = [`${coffees.length} coffee${coffees.length === 1 ? '' : 's'}`];
-  if (avg != null) bits.push(`avg ${avg.toFixed(1)} ★`);
+  for (const r of RATERS) {
+    const avg = averageRating(coffees, r.id);
+    if (avg != null) bits.push(`${r.label} ${avg.toFixed(1)} ★`);
+  }
   if (filtering) {
     const n = coffees.filter((c) => matchedIds.has(c.id)).length;
     bits.push(`${n} match the filter`);
@@ -281,6 +296,37 @@ function readRow(row) {
   };
 }
 
+const SCORE_STEPS = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
+
+/** Score selects are generated from the rater roster rather than written into the
+ *  markup, so adding a third person to raters.js surfaces them here for free. */
+function buildRatingFields(coffee) {
+  const wrap = $('#f-ratings');
+  wrap.innerHTML = RATERS.map((r) => `
+    <div class="rating-slot">
+      <label for="f-rating-${escapeHtml(r.id)}">${escapeHtml(r.label)} rating</label>
+      <select id="f-rating-${escapeHtml(r.id)}" data-rater="${escapeHtml(r.id)}">
+        <option value="">&mdash;</option>
+        ${SCORE_STEPS.map((n) => `<option value="${n}">${n}</option>`).join('')}
+      </select>
+    </div>`).join('');
+
+  for (const r of RATERS) {
+    const v = scoreOf(coffee, r.id);
+    $(`#f-rating-${r.id}`).value = v == null ? '' : String(v);
+  }
+}
+
+/** Only scores actually given are stored, so "unrated" stays distinct from zero. */
+function collectRatings() {
+  const out = {};
+  for (const r of RATERS) {
+    const raw = $(`#f-rating-${r.id}`).value;
+    if (raw) out[r.id] = Number(raw);
+  }
+  return out;
+}
+
 export function openCoffeeForm({ coffee, countryIso, countries, suggestions, onSave, onDelete }) {
   const dlg = $('#dlg-coffee');
   const editing = Boolean(coffee);
@@ -320,7 +366,7 @@ export function openCoffeeForm({ coffee, countryIso, countries, suggestions, onS
   $('#f-name').value    = coffee ? coffee.name : '';
   $('#f-roaster').value = coffee ? coffee.roaster : '';
   $('#f-flavor').value  = coffee ? coffee.flavorNotes.join(', ') : '';
-  $('#f-rating').value  = coffee && coffee.rating != null ? String(coffee.rating) : '';
+  buildRatingFields(coffee);
   $('#f-date').value    = coffee ? coffee.dateTried : new Date().toISOString().slice(0, 10);
   $('#f-notes').value   = coffee ? coffee.notes : '';
 
@@ -333,7 +379,7 @@ export function openCoffeeForm({ coffee, countryIso, countries, suggestions, onS
       name: $('#f-name').value.trim(),
       roaster: $('#f-roaster').value.trim(),
       flavorNotes: listFrom($('#f-flavor').value),
-      rating: $('#f-rating').value ? Number($('#f-rating').value) : null,
+      ratings: collectRatings(),
       dateTried: $('#f-date').value,
       notes: $('#f-notes').value.trim(),
       components: comps,
@@ -442,11 +488,128 @@ export function renderLegend({ colorBy, filtering, total }) {
   el.hidden = false;
   const swatches = ['--c1', '--c2', '--c3', '--c4', '--c5', '--c6']
     .map((t) => `<span class="sw" style="background:var(${t})"></span>`).join('');
-  const ends = colorBy === 'rating' ? ['1 ★', '5 ★'] : ['1', '12+'];
+  const isCount = colorBy === 'count';
+  const ends = isCount ? ['1', '12+'] : ['1 ★', '5 ★'];
   el.innerHTML = `
-    <h4>${colorBy === 'rating' ? 'Average rating' : 'Coffees tried'}</h4>
+    <h4>${isCount ? 'Coffees tried' : `${escapeHtml(raterLabel(colorBy))} rating`}</h4>
     <div class="ramp">${swatches}</div>
     <div class="ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>
+    ${isCount ? '' : `<div class="no-score-row"><span class="ns-sw"></span> tried, not scored by ${escapeHtml(raterLabel(colorBy))}</div>`}
     ${filtering ? '<div class="hi-row"><span class="hi-sw"></span> matches filter</div>' : ''}
   `;
+}
+
+/* ------------------------------------------------------------------ list */
+
+const uniq  = (xs) => [...new Set(xs.filter(Boolean))];
+const pills = (xs, cls = '') => xs.map((v) => `<span class="pill ${cls}">${escapeHtml(v)}</span>`).join('');
+
+const originsOf    = (c) => countriesOf(c).map(countryNameOf);
+const varietiesOf  = (c) => uniq(components(c).flatMap((k) => k.variety));
+const processesOf  = (c) => uniq(components(c).map((k) => k.process));
+
+/**
+ * Table columns. `get` yields a sort key, `cell` the rendered HTML. A blend
+ * flattens across its components here — the list is for scanning everything at
+ * once, and the card or form is where the per-origin detail lives.
+ */
+export const LIST_COLUMNS = [
+  { key: 'name',    label: 'Coffee',  get: (c) => c.name,
+    cell: (c) => `<span class="lc-name">${escapeHtml(c.name)}</span>` +
+                 (components(c).length > 1 ? '<span class="blend-badge">blend</span>' : '') },
+  { key: 'roaster', label: 'Roaster', get: (c) => c.roaster, cell: (c) => escapeHtml(c.roaster) },
+  { key: 'origin',  label: 'Origin',  get: (c) => originsOf(c)[0] || '',
+    cell: (c) => pills(originsOf(c), 'origin') },
+  { key: 'variety', label: 'Variety', get: (c) => varietiesOf(c)[0] || '',
+    cell: (c) => pills(varietiesOf(c), 'variety') },
+  { key: 'process', label: 'Process', get: (c) => processesOf(c)[0] || '',
+    cell: (c) => pills(processesOf(c)) },
+  ...RATERS.map((r) => ({
+    key: `rating:${r.id}`, label: r.label, numeric: true, numCol: true,
+    get: (c) => scoreOf(c, r.id),
+    cell: (c) => {
+      const v = scoreOf(c, r.id);
+      return v == null ? '<span class="unrated">&mdash;</span>' : `<span class="num">${v}</span>`;
+    },
+  })),
+  { key: 'date',    label: 'Tried',   get: (c) => c.dateTried,
+    cell: (c) => (c.dateTried ? formatDate(c.dateTried) : '') },
+];
+
+const isEmptyCell = (v) => v == null || v === '';
+
+/** Unrated and unfilled cells sort last in *both* directions — flipping to
+ *  descending should surface the best coffees, not a wall of blanks. */
+function compareBy(col, dir) {
+  return (a, b) => {
+    const va = col.get(a), vb = col.get(b);
+    if (isEmptyCell(va) && isEmptyCell(vb)) return 0;
+    if (isEmptyCell(va)) return 1;
+    if (isEmptyCell(vb)) return -1;
+    const r = col.numeric ? Number(va) - Number(vb)
+                          : String(va).localeCompare(String(vb), undefined, { sensitivity: 'base' });
+    return dir === 'desc' ? -r : r;
+  };
+}
+
+export function renderList({ coffees, sort, total, filtering, onSort, onEdit, onDelete, canEdit }) {
+  const count = $('#list-count');
+  count.textContent = filtering
+    ? `${coffees.length} of ${total} coffee${total === 1 ? '' : 's'}`
+    : `${total} coffee${total === 1 ? '' : 's'}`;
+
+  const head = $('#list-head');
+  head.innerHTML = `<tr>${LIST_COLUMNS.map((col) => {
+    const on = sort.key === col.key;
+    const dir = on ? sort.dir : 'none';
+    return `<th scope="col" class="${col.numCol ? 'num-col' : ''}${on ? ' sorted' : ''}"` +
+           ` aria-sort="${on ? (dir === 'asc' ? 'ascending' : 'descending') : 'none'}">` +
+           `<button type="button" data-sort="${col.key}">${escapeHtml(col.label)}` +
+           `<span class="arrow" aria-hidden="true">${on ? (dir === 'asc' ? '▲' : '▼') : ''}</span>` +
+           `</button></th>`;
+  }).join('')}${canEdit ? '<th scope="col"><span class="sr-only">Actions</span></th>' : ''}</tr>`;
+
+  for (const btn of head.querySelectorAll('button[data-sort]')) {
+    btn.addEventListener('click', () => onSort(btn.dataset.sort));
+  }
+
+  const body = $('#list-body');
+  body.innerHTML = '';
+  const empty = $('#list-empty');
+
+  if (!coffees.length) {
+    empty.hidden = false;
+    empty.textContent = total
+      ? 'No coffees match the current filters.'
+      : 'No coffees logged yet. Use Add coffee to log your first one.';
+    return;
+  }
+  empty.hidden = true;
+
+  const col = LIST_COLUMNS.find((c) => c.key === sort.key) || LIST_COLUMNS[0];
+  const rows = [...coffees].sort(compareBy(col, sort.dir));
+
+  for (const coffee of rows) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = LIST_COLUMNS
+      .map((c) => `<td class="${c.numCol ? 'num-col' : ''}">${c.cell(coffee)}</td>`).join('');
+
+    if (canEdit) {
+      const td = document.createElement('td');
+      td.className = 'row-actions';
+      const edit = document.createElement('button');
+      edit.className = 'btn tiny';
+      edit.type = 'button';
+      edit.textContent = 'Edit';
+      edit.addEventListener('click', () => onEdit(coffee));
+      const del = document.createElement('button');
+      del.className = 'btn tiny danger-text';
+      del.type = 'button';
+      del.textContent = 'Delete';
+      del.addEventListener('click', () => onDelete(coffee));
+      td.append(edit, del);
+      tr.append(td);
+    }
+    body.append(tr);
+  }
 }

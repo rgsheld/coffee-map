@@ -12,6 +12,8 @@
  * model would report that blend as a washed Gesha, which it never was.
  */
 
+import { RATERS, scoreOf, scoreFor } from './raters.js?v=4';
+
 /** `scope` decides what a facet reads from, and how the AND above is evaluated.
  *  'coffee'    — properties of the cup as drunk (you rate and taste the blend).
  *  'component' — properties of one origin (varieties, process, place). */
@@ -22,9 +24,18 @@ export const FACETS = [
   { key: 'producer',    label: 'Producer',     scope: 'component', values: (x) => (x.producer ? [x.producer] : []) },
   { key: 'roaster',     label: 'Roaster',      scope: 'coffee',    values: (c) => (c.roaster ? [c.roaster] : []) },
   { key: 'flavorNotes', label: 'Flavour note', scope: 'coffee',    values: (c) => c.flavorNotes },
-  { key: 'rating',      label: 'Rating',       scope: 'coffee',    values: (c) => (c.rating ? [`${c.rating}`] : []) },
+  // One facet per rater: "RH gave it a 4" and "AS gave it a 4" are different
+  // questions, and collapsing them would make either score unfilterable.
+  ...RATERS.map((r) => ({
+    key: `rating:${r.id}`,
+    label: `${r.label} rating`,
+    scope: 'coffee',
+    values: (c) => { const v = scoreOf(c, r.id); return v == null ? [] : [`${v}`]; },
+  })),
   { key: 'year',        label: 'Year tried',   scope: 'coffee',    values: (c) => (c.dateTried ? [c.dateTried.slice(0, 4)] : []) },
 ];
+
+export const isRatingFacet = (key) => key.startsWith('rating:');
 
 const COMPONENT_FACETS = FACETS.filter((f) => f.scope === 'component');
 const COFFEE_FACETS    = FACETS.filter((f) => f.scope === 'coffee');
@@ -81,7 +92,7 @@ export function buildFacets(coffees) {
       .map(([value, count]) => ({ value, count }))
       .sort((a, b) => b.count - a.count || collate(a.value, b.value));
     // Ratings and years read better in numeric order than by popularity.
-    if (facet.key === 'rating') values.sort((a, b) => Number(b.value) - Number(a.value));
+    if (isRatingFacet(facet.key)) values.sort((a, b) => Number(b.value) - Number(a.value));
     if (facet.key === 'year')   values.sort((a, b) => Number(b.value) - Number(a.value));
     return { ...facet, values };
   }).filter((f) => f.values.length > 0);
@@ -179,8 +190,13 @@ export function byCountry(coffees) {
   return map;
 }
 
-export function averageRating(coffees) {
-  const rated = coffees.filter((c) => typeof c.rating === 'number' && !Number.isNaN(c.rating));
-  if (!rated.length) return null;
-  return rated.reduce((sum, c) => sum + c.rating, 0) / rated.length;
+/**
+ * Mean score across a set of coffees for one rater — or for 'avg', the combined
+ * mean. Coffees nobody scored are excluded rather than counted as zero, so a
+ * single 5 does not get dragged down by everything still unrated.
+ */
+export function averageRating(coffees, key = 'avg') {
+  const vals = coffees.map((c) => scoreFor(c, key)).filter((v) => v != null);
+  if (!vals.length) return null;
+  return vals.reduce((sum, v) => sum + v, 0) / vals.length;
 }

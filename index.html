@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="light dark">
 <title>Coffee Map</title>
 <link rel="stylesheet" href="js/vendor/leaflet.css">
-<link rel="stylesheet" href="css/app.css?v=2">
+<link rel="stylesheet" href="css/app.css?v=4">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9749;</text></svg>">
 </head>
 <body>
@@ -16,12 +16,13 @@
   <h1 class="brand"><span class="brand-mark" aria-hidden="true">&#9749;</span><span class="brand-text">Coffee Map</span></h1>
   <div class="summary" id="summary" role="status" aria-live="polite"></div>
   <div class="topbar-actions">
-    <label class="colorby">
+    <div class="viewtoggle" role="group" aria-label="View">
+      <button type="button" class="vt" id="btn-view-map" aria-pressed="true">Map</button>
+      <button type="button" class="vt" id="btn-view-list" aria-pressed="false">List</button>
+    </div>
+    <label class="colorby" id="colorby-wrap">
       <span class="only-desktop">Shade by</span>
-      <select id="color-by" aria-label="Shade countries by">
-        <option value="count">Number tried</option>
-        <option value="rating">Average rating</option>
-      </select>
+      <select id="color-by" aria-label="Shade countries by"></select>
     </label>
     <button class="btn primary compact" id="btn-add" title="Add a coffee">
       <span aria-hidden="true">+</span><span class="only-desktop">Add coffee</span>
@@ -52,9 +53,23 @@
   </aside>
 
   <!-- ============ Map ============ -->
-  <main class="map-wrap">
+  <main class="map-wrap" id="map-wrap">
     <div id="map" role="application" aria-label="World map of coffee origins"></div>
     <div class="legend" id="legend" aria-hidden="true"></div>
+  </main>
+
+  <!-- ============ List view ============ -->
+  <main class="list-wrap" id="list-wrap" hidden aria-label="All coffees">
+    <div class="list-tools">
+      <span class="list-count" id="list-count" role="status" aria-live="polite"></span>
+    </div>
+    <div class="list-scroll">
+      <table class="coffee-table">
+        <thead id="list-head"></thead>
+        <tbody id="list-body"></tbody>
+      </table>
+    </div>
+    <p class="list-empty" id="list-empty" hidden></p>
   </main>
 
   <!-- ============ Country detail panel ============ -->
@@ -115,17 +130,7 @@
         <datalist id="dl-flavor"></datalist>
       </div>
 
-      <div class="field">
-        <label for="f-rating">Rating</label>
-        <select id="f-rating" name="rating">
-          <option value="">&mdash;</option>
-          <option value="1">1</option><option value="1.5">1.5</option>
-          <option value="2">2</option><option value="2.5">2.5</option>
-          <option value="3">3</option><option value="3.5">3.5</option>
-          <option value="4">4</option><option value="4.5">4.5</option>
-          <option value="5">5</option>
-        </select>
-      </div>
+      <div class="field ratings-field" id="f-ratings"></div>
 
       <div class="field">
         <label for="f-date">Date tried</label>
@@ -203,6 +208,6 @@
 <div class="scrim" id="scrim" hidden></div>
 
 <script src="js/vendor/leaflet.js"></script>
-<script type="module" src="js/app.js?v=2"></script>
+<script type="module" src="js/app.js?v=4"></script>
 </body>
 </html>

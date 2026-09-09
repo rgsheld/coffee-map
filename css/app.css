@@ -19,6 +19,8 @@
   --panel-w:       396px;
   /* choropleth ramp: parchment -> espresso */
   --c1:#e9c7a4; --c2:#d9a877; --c3:#c48950; --c4:#a76c35; --c5:#834f21; --c6:#57320f;
+  /* tried, but unscored by whoever the map is currently shaded for */
+  --no-score:      #cdc5b8;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,6 +40,7 @@
     --danger:      #f2695f;
     --shadow:      0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.45);
     --c1:#5b4028; --c2:#7a5531; --c3:#996b3b; --c4:#b98547; --c5:#d6a25d; --c6:#f0c184;
+    --no-score:  #4a4137;
   }
 }
 
@@ -426,3 +429,73 @@ dialog form { display: contents; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* ---------------------------------------------------------------- view toggle */
+.viewtoggle { display: inline-flex; border: 1px solid var(--border); border-radius: 999px;
+  background: var(--surface-2); padding: 2px; }
+.viewtoggle .vt { border: 0; background: none; color: var(--muted); font: inherit; font-size: 12.5px;
+  font-weight: 600; padding: 5px 13px; border-radius: 999px; cursor: pointer; min-height: 30px; }
+.viewtoggle .vt[aria-pressed="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.viewtoggle .vt:hover { color: var(--text); }
+
+/* ---------------------------------------------------------------- score badges */
+.card-top .score { display: inline-flex; align-items: baseline; gap: 4px; white-space: nowrap; font-size: 12px; }
+.card-top .score + .score { margin-left: 8px; }
+.card-top .score b { color: var(--muted); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; }
+.card-top .score .stars { color: var(--hi); letter-spacing: .5px; }
+
+/* ---------------------------------------------------------------- form ratings */
+/* .field is a column flex; the two scores belong side by side, and they read as a
+   pair rather than two unrelated fields. */
+.ratings-field { display: flex; flex-direction: row; gap: 10px; }
+.rating-slot { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.rating-slot label { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+
+/* ---------------------------------------------------------------- list view */
+.list-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; background: var(--bg); }
+.list-tools { padding: 10px 16px; border-bottom: 1px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; gap: 12px; }
+.list-count { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+/* The table can outgrow narrow screens; scroll it here rather than the page. */
+.list-scroll { flex: 1; overflow: auto; min-height: 0; }
+.list-empty { padding: 28px 16px; color: var(--muted); font-size: 13.5px; text-align: center; }
+
+.coffee-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.coffee-table th, .coffee-table td { text-align: left; padding: 8px 12px;
+  border-bottom: 1px solid var(--border); vertical-align: top; }
+.coffee-table thead th { position: sticky; top: 0; z-index: 2; background: var(--surface);
+  border-bottom: 1px solid var(--border); padding: 0; white-space: nowrap; }
+.coffee-table thead th button { width: 100%; text-align: inherit; border: 0; background: none;
+  font: inherit; font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--muted); padding: 9px 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.coffee-table thead th button:hover { color: var(--text); }
+.coffee-table thead th.sorted button { color: var(--accent); }
+.coffee-table thead th .arrow { font-size: 8px; }
+.coffee-table thead th.num-col button { justify-content: flex-end; }
+.coffee-table tbody tr:hover { background: var(--surface); }
+.coffee-table .lc-name { font-weight: 600; }
+.coffee-table td.num-col { text-align: right; white-space: nowrap; }
+.coffee-table .num { font-variant-numeric: tabular-nums; font-weight: 600; }
+.coffee-table .unrated { color: var(--muted); opacity: .55; }
+.coffee-table .row-actions { white-space: nowrap; text-align: right; }
+.btn.tiny { padding: 3px 8px; min-height: 26px; font-size: 12px; }
+
+.pill { display: inline-block; padding: 1px 7px; margin: 0 3px 3px 0; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface-2); font-size: 11.5px; color: var(--muted); }
+.pill.origin { color: var(--text); font-weight: 600; }
+.pill.variety { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); font-weight: 600; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 768px) {
+  .ratings-field { gap: 8px; }
+  .coffee-table { font-size: 12.5px; }
+  .coffee-table th, .coffee-table td { padding: 7px 9px; }
+  .list-tools { padding: 8px 12px; }
+}
+
+.legend .no-score-row { display: flex; align-items: center; gap: 6px; margin-top: 6px;
+  font-size: 11px; color: var(--muted); }
+.legend .ns-sw { width: 12px; height: 12px; border-radius: 3px; background: var(--no-score);
+  border: 1px solid var(--border); flex: none; }

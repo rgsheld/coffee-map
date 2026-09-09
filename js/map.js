@@ -136,9 +136,11 @@ function baseStyle() {
 function shadeFor(iso) {
   const count = view.counts.get(iso) || 0;
   if (!count) return null;
-  if (view.colorBy === 'rating') {
+  if (view.colorBy !== 'count') {
     const avg = view.ratings.get(iso);
-    if (avg == null) return css('--c1');
+    // Nobody has scored it *as this rater*. Painting it --c1 would be a lie: it
+    // would read as a genuine 1-star average rather than an absent opinion.
+    if (avg == null) return css('--no-score');
     const idx = Math.min(RAMP.length - 1, Math.max(0, Math.round((avg - 1) / 4 * (RAMP.length - 1))));
     return css(RAMP[idx]);
   }

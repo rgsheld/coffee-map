@@ -3,12 +3,13 @@
  * everything else from the store on each render, and pushes it to the map and DOM.
  */
 
-import * as store from './store.js?v=2';
-import * as mapView from './map.js?v=2';
-import * as ui from './ui.js?v=2';
+import * as store from './store.js?v=4';
+import * as mapView from './map.js?v=4';
+import * as ui from './ui.js?v=4';
 import { buildFacets, applyFilters, byCountry, averageRating, emptyFilters,
          hasActiveFilters, setCountryNameResolver, matchingCountries, countriesOf,
-         FACETS } from './filters.js?v=2';
+         FACETS } from './filters.js?v=4';
+import { RATERS } from './raters.js?v=4';
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -16,6 +17,8 @@ const view = {
   filters: emptyFilters(),
   search: '',
   colorBy: 'count',
+  mode: 'map',                        // 'map' | 'list'
+  sort: { key: 'date', dir: 'desc' }, // list view; most recently tried first
   selected: null,
   countries: [],
 };
@@ -27,12 +30,14 @@ function derive() {
   const filtering = hasActiveFilters(view.filters, view.search);
   const filtered = filtering ? applyFilters(coffees, view.filters, view.search) : coffees;
 
+  // 'count' shades by volume, but the map still needs *some* score to fall back on.
+  const scoreKey = view.colorBy === 'count' ? 'avg' : view.colorBy;
   const grouped = byCountry(coffees);
   const counts = new Map();
   const ratings = new Map();
   for (const [iso, list] of grouped) {
     counts.set(iso, list.length);
-    const avg = averageRating(list);
+    const avg = averageRating(list, scoreKey);
     if (avg != null) ratings.set(iso, avg);
   }
 
@@ -55,10 +60,25 @@ function derive() {
 function render() {
   const d = derive();
 
-  mapView.render({
-    counts: d.counts, ratings: d.ratings, matched: d.matched,
-    colorBy: view.colorBy, selected: view.selected,
-  });
+  const listMode = view.mode === 'list';
+  $('#map-wrap').hidden   = listMode;
+  $('#list-wrap').hidden  = !listMode;
+  $('#colorby-wrap').hidden = listMode;      // shading is a map-only idea
+  $('#btn-view-map').setAttribute('aria-pressed', String(!listMode));
+  $('#btn-view-list').setAttribute('aria-pressed', String(listMode));
+  $('#panel').hidden = listMode || !view.selected;
+
+  if (listMode) {
+    ui.renderList({
+      coffees: d.filtered, sort: view.sort, total: d.coffees.length, filtering: d.filtering,
+      onSort: setSort, onEdit: editCoffee, onDelete: deleteCoffee, canEdit: true,
+    });
+  } else {
+    mapView.render({
+      counts: d.counts, ratings: d.ratings, matched: d.matched,
+      colorBy: view.colorBy, selected: view.selected,
+    });
+  }
 
   // Facet counts are computed over the *unfiltered* list so chips never vanish
   // mid-selection, which would make the filter panel jump around under the cursor.
@@ -115,6 +135,25 @@ function renderSyncState() {
   const clearBtn = $('#btn-clear-samples');
   clearBtn.hidden = samples === 0;
   clearBtn.textContent = `Clear ${samples} sample coffee${samples === 1 ? '' : 's'}`;
+}
+
+/* ------------------------------------------------------------------ view */
+
+function setMode(mode) {
+  if (view.mode === mode) return;
+  view.mode = mode;
+  render();
+  // Leaflet measures itself on show; without this it renders into a stale size.
+  if (mode === 'map') mapView.invalidate();
+}
+
+/** Re-clicking a column flips it. A fresh column starts descending for scores and
+ *  dates (best and newest first) and ascending for text, which is what people expect. */
+function setSort(key) {
+  view.sort = view.sort.key === key
+    ? { key, dir: view.sort.dir === 'asc' ? 'desc' : 'asc' }
+    : { key, dir: (key === 'date' || key.startsWith('rating:')) ? 'desc' : 'asc' };
+  render();
 }
 
 /* ------------------------------------------------------------------ filters */
@@ -331,6 +370,9 @@ function wire() {
   // reach them for a first entry.
   $('#btn-add').addEventListener('click', () => addCoffee(view.selected));
 
+  $('#btn-view-map').addEventListener('click', () => setMode('map'));
+  $('#btn-view-list').addEventListener('click', () => setMode('list'));
+
   $('#btn-settings').addEventListener('click', openSettings);
   $('#btn-close-settings').addEventListener('click', () => $('#dlg-settings').close());
   $('#btn-test').addEventListener('click', testConnection);
@@ -375,6 +417,14 @@ function wire() {
   store.subscribe(renderSyncState);
 }
 
+/** Shade-by options come from the rater roster, so a third person needs no markup. */
+function fillColorBy() {
+  $('#color-by').innerHTML =
+    '<option value="count">Number tried</option>' +
+    RATERS.map((r) => `<option value="${r.id}">${r.label} rating</option>`).join('') +
+    (RATERS.length > 1 ? '<option value="avg">Combined rating</option>' : '');
+}
+
 /* ------------------------------------------------------------------ start */
 
 async function start() {
@@ -391,6 +441,7 @@ async function start() {
 
   // Browsers restore form controls on reload without firing change/input, so read
   // the rendered values rather than assuming the defaults still hold.
+  fillColorBy();
   view.colorBy = $('#color-by').value || 'count';
   view.search = $('#search').value || '';
 

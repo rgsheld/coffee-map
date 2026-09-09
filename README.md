@@ -81,7 +81,16 @@ To put it on your phone home screen: Safari → Share → *Add to Home Screen*.
 - **Filter chips** in the sidebar highlight matching countries in gold and dim the rest.
   Picking several values in one group means *any of them*; picking across groups narrows
   (`Gesha` + `Natural` = naturally-processed Geshas only).
-- **Shade by** switches the map between number tried and average rating.
+- **Map / List** switches between the map and a sortable table of everything you've
+  tried. The list obeys the same filters and search, so narrowing to `Gesha` in the
+  sidebar narrows the table too. Click a column heading to sort; clicking it again
+  flips the direction. Scores and dates start descending (best and newest first),
+  text columns ascending, and blanks always sort last so flipping to descending
+  surfaces your favourites rather than a wall of unrated rows.
+- **Shade by** switches the map between number tried, either person's rating, and the
+  two combined. A country you've tried but *that person* hasn't scored is drawn in a
+  distinct grey, never as a pale ramp colour — otherwise "no opinion yet" would be
+  indistinguishable from "they gave it a 1".
 - **`/`** focuses the search box. **Esc** closes panels.
 - **Blends** are first-class. A coffee holds one or more *origins*; hit **+ Add origin**
   in the form to add another. Each origin carries its own country, region, producer,
@@ -93,6 +102,10 @@ To put it on your phone home screen: Safari → Share → *Add to Home Screen*.
 - Because origins are kept whole, `Gesha` + `Washed` matches only a coffee where one
   origin is *both*. A flat list of varieties and processes would report a natural Gesha
   blended with a washed Caturra as a washed Gesha, which it never was.
+- **Two scores per coffee.** RH and AS each rate independently, so you can disagree
+  about the same cup and both keep your own record. Either can be left blank; unrated
+  is kept distinct from zero and is excluded from averages rather than dragging them
+  down. Each person gets their own filter group and their own map shading.
 - Variety and flavour notes are comma-separated, and every text field autocompletes from
   what you've already entered — worth accepting the suggestion so the filters group
   cleanly (`Gesha` and `Geisha` would otherwise be two separate chips).
@@ -145,15 +158,23 @@ data/countries.geo.json  world country polygons, keyed by ISO alpha-3
 
 ### Data shape
 
-`data/coffees.json` is `{ version: 2, updatedAt, coffees: [...] }`. Each coffee keeps what
-belongs to the cup as drunk — `name`, `roaster`, `flavorNotes`, `rating`, `dateTried`,
+`data/coffees.json` is `{ version: 3, updatedAt, coffees: [...] }`. Each coffee keeps what
+belongs to the cup as drunk — `name`, `roaster`, `flavorNotes`, `ratings`, `dateTried`,
 `notes` — plus a `components` array. Each component is one origin: `country` (ISO alpha-3),
 `region`, `producer`, `variety[]`, `process`, `altitude`, `share`.
 
-Version 1 kept `country`/`region`/`variety`/`process`/`altitude` flat on the coffee and is
-migrated automatically on load, so an old file still opens. A v1 `process` of
-`"honey, washed"` is split into one component per process, pairing varieties positionally
-when the counts line up — check those entries once after upgrading.
+`ratings` is keyed by rater: `{ "RH": 4, "AS": 3.5 }`. Only scores actually given are
+stored, so an absent key means "not rated" rather than zero. The roster lives in
+`js/raters.js`; adding a third person there surfaces them in the form, the filters, the
+list and the map shading without any other edit.
+
+Older files migrate automatically on load, so nothing needs converting by hand:
+
+- **v1 → v2.** `country`/`region`/`variety`/`process`/`altitude` were flat on the coffee.
+  A v1 `process` of `"honey, washed"` is split into one component per process, pairing
+  varieties positionally when the counts line up — worth checking those entries once.
+- **v2 → v3.** A single unnamed `rating` becomes the *first* rater's score (`RH`), since
+  that is whose opinion it was. It is never copied to both people.
 
 Two rules worth keeping if you edit the code:
 

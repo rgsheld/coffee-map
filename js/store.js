@@ -10,7 +10,8 @@
  * unlimited, while anonymous API calls are capped at 60/hour per IP.
  */
 
-import * as gh from './github.js?v=2';
+import * as gh from './github.js?v=4';
+import { RATERS } from './raters.js?v=4';
 
 export const DATA_PATH = 'data/coffees.json';
 const DEFAULT_REPO = 'rgsheld/coffee-map';
@@ -95,14 +96,15 @@ function normalise(doc) {
     // rest: serialise() rewrites the whole file, so any field this version doesn't
     // know about would otherwise be stripped from every coffee by an older client
     // still running cached JavaScript.
-    const { country, region, producer, variety, process, altitude, components, ...rest } = c;
+    const { country, region, producer, variety, process, altitude, components,
+            rating, ratings, ...rest } = c;
     return {
       ...rest,
       id: c.id || newId(),
       name: str(c.name),
       roaster: str(c.roaster),
       flavorNotes: arr(c.flavorNotes ?? c.flavourNotes ?? c.notes_flavor),
-      rating: num(c.rating),
+      ratings: ratingsOf(c),
       dateTried: str(c.dateTried),
       notes: str(c.notes),
       components: componentsOf(c),
@@ -112,6 +114,24 @@ function normalise(doc) {
       updatedAt: c.updatedAt || c.createdAt || new Date().toISOString(),
     };
   });
+}
+
+/** Per-person scores. Pre-v3 files carried a single unnamed `rating`; that score
+ *  belonged to the original rater, so it becomes theirs rather than being dropped
+ *  or, worse, silently attributed to both people. */
+function ratingsOf(c) {
+  const src = (c.ratings && typeof c.ratings === 'object') ? c.ratings : {};
+  const out = {};
+  for (const r of RATERS) {
+    const v = num(src[r.id]);
+    if (v != null) out[r.id] = v;
+  }
+  const [first] = RATERS;
+  if (first && out[first.id] == null) {
+    const legacy = num(c.rating);
+    if (legacy != null) out[first.id] = legacy;
+  }
+  return out;
 }
 
 export function blankComponent() {
@@ -183,7 +203,7 @@ function serialise(coffees) {
     ? c.components[0].country || '' : '');
   const sorted = [...coffees].sort((a, b) =>
     key(a).localeCompare(key(b)) || String(a.name).localeCompare(String(b.name)));
-  return JSON.stringify({ version: 2, updatedAt: new Date().toISOString(), coffees: sorted }, null, 2) + '\n';
+  return JSON.stringify({ version: 3, updatedAt: new Date().toISOString(), coffees: sorted }, null, 2) + '\n';
 }
 
 /* ------------------------------------------------------------------ load */
