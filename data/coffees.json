@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-09-09T23:06:25.459Z",
+  "updatedAt": "2026-09-09T23:06:42.094Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -44,15 +44,15 @@
       "dateTried": "2026-08-25",
       "notes": "Switch. Had an odd tannic mouth feel but smooth deep sweetness (@ 2 weeks)",
       "createdAt": "2026-08-25T20:11:38.330Z",
-      "updatedAt": "2026-09-07T17:41:30.909Z",
+      "updatedAt": "2026-09-09T23:06:42.092Z",
       "ratings": {
         "RH": 4
       },
       "components": [
         {
           "country": "COL",
-          "region": "Cauca, Wilton Benitez",
-          "producer": "",
+          "region": "Cauca",
+          "producer": "Wilton Benitez",
           "variety": [
             "Red Bourbon"
           ],
