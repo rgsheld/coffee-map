@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-09-09T23:06:42.094Z",
+  "updatedAt": "2026-09-09T23:06:47.207Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -15,7 +15,7 @@
       "dateTried": "2026-09-09",
       "notes": "Switch @ 2 weeks: some of the earl grey/molasses but not much acidity. Not bitter though.",
       "createdAt": "2026-09-09T16:26:52.475Z",
-      "updatedAt": "2026-09-09T23:06:25.456Z",
+      "updatedAt": "2026-09-09T23:06:47.205Z",
       "ratings": {
         "RH": 3
       },
