@@ -1,8 +1,9 @@
 {
   "version": 1,
-  "updatedAt": "2026-09-09T16:26:52.494Z",
+  "updatedAt": "2026-09-09T17:30:35.447Z",
   "coffees": [
     {
+      "id": "c_20260909_i13jdf",
       "name": "Hills of Heza",
       "country": "BDI",
       "region": "Kayanza",
@@ -17,13 +18,12 @@
         "raisin",
         "earl grey"
       ],
-      "rating": null,
+      "rating": 3,
       "dateTried": "2026-09-09",
       "altitude": 2100,
-      "notes": "",
-      "id": "c_20260909_i13jdf",
+      "notes": "Switch @ 2 weeks: some of the earl grey/molasses but not much acidity. Not bitter though.",
       "createdAt": "2026-09-09T16:26:52.475Z",
-      "updatedAt": "2026-09-09T16:26:52.475Z"
+      "updatedAt": "2026-09-09T17:30:35.445Z"
     },
     {
       "id": "c_20260825_u7fcpx",
