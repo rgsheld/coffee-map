@@ -1,16 +1,10 @@
 {
-  "version": 1,
-  "updatedAt": "2026-09-09T17:30:35.447Z",
+  "version": 3,
+  "updatedAt": "2026-09-09T23:06:25.459Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
       "name": "Hills of Heza",
-      "country": "BDI",
-      "region": "Kayanza",
-      "variety": [
-        "Red Bourbon"
-      ],
-      "process": "Washed",
       "roaster": "Loveless Coffees",
       "flavorNotes": [
         "Molasses",
@@ -18,44 +12,59 @@
         "raisin",
         "earl grey"
       ],
-      "rating": 3,
       "dateTried": "2026-09-09",
-      "altitude": 2100,
       "notes": "Switch @ 2 weeks: some of the earl grey/molasses but not much acidity. Not bitter though.",
       "createdAt": "2026-09-09T16:26:52.475Z",
-      "updatedAt": "2026-09-09T17:30:35.445Z"
+      "updatedAt": "2026-09-09T23:06:25.456Z",
+      "ratings": {
+        "RH": 3
+      },
+      "components": [
+        {
+          "country": "BDI",
+          "region": "Kayanza",
+          "producer": "",
+          "variety": [
+            "Red Bourbon"
+          ],
+          "process": "Washed",
+          "altitude": 2100,
+          "share": null
+        }
+      ]
     },
     {
       "id": "c_20260825_u7fcpx",
       "name": "Granja Paraiso 92",
-      "country": "COL",
-      "region": "Cauca, Wilton Benitez",
-      "variety": [
-        "Red Bourbon"
-      ],
-      "process": "Double Anaerobic Washed",
       "roaster": "Moonwake",
       "flavorNotes": [
         "strawberry",
         "hibiscus"
       ],
-      "rating": 4,
       "dateTried": "2026-08-25",
-      "altitude": null,
       "notes": "Switch. Had an odd tannic mouth feel but smooth deep sweetness (@ 2 weeks)",
       "createdAt": "2026-08-25T20:11:38.330Z",
-      "updatedAt": "2026-09-07T17:41:30.909Z"
+      "updatedAt": "2026-09-07T17:41:30.909Z",
+      "ratings": {
+        "RH": 4
+      },
+      "components": [
+        {
+          "country": "COL",
+          "region": "Cauca, Wilton Benitez",
+          "producer": "",
+          "variety": [
+            "Red Bourbon"
+          ],
+          "process": "Double Anaerobic Washed",
+          "altitude": null,
+          "share": null
+        }
+      ]
     },
     {
       "id": "c_20260825_ewommo",
       "name": "Full Spectrum",
-      "country": "ETH",
-      "region": "Arbegona, Sidama/ Duwancho Washing Station",
-      "variety": [
-        "74110",
-        "74158"
-      ],
-      "process": "Anaerobic Honey, Washed",
       "roaster": "Black and White",
       "flavorNotes": [
         "light florals",
@@ -63,36 +72,69 @@
         "raspberry lemonade",
         "new world wine"
       ],
-      "rating": 3.5,
       "dateTried": "2026-08-25",
-      "altitude": 2150,
       "notes": "Brewed with Switch at ~3 weeks post roast was just beginning to get good flavor profile",
       "createdAt": "2026-08-25T20:08:11.904Z",
-      "updatedAt": "2026-08-25T20:44:59.463Z"
+      "updatedAt": "2026-08-25T20:44:59.463Z",
+      "ratings": {
+        "RH": 3.5
+      },
+      "components": [
+        {
+          "country": "ETH",
+          "region": "Arbegona, Sidama/ Duwancho Washing Station",
+          "producer": "",
+          "variety": [
+            "74110"
+          ],
+          "process": "Anaerobic Honey",
+          "altitude": 2150,
+          "share": null
+        },
+        {
+          "country": "ETH",
+          "region": "Arbegona, Sidama/ Duwancho Washing Station",
+          "producer": "",
+          "variety": [
+            "74158"
+          ],
+          "process": "Washed",
+          "altitude": 2150,
+          "share": null
+        }
+      ]
     },
     {
       "id": "c_20260825_kujrvw",
       "name": "Finca Liquidambar - yellow honey field blend",
-      "country": "HND",
-      "region": "San Jose La Paz, Roberto Rene Gonzalez, Finca Liquidambar",
-      "variety": [
-        "Bourbon",
-        "Catuai",
-        "Pacas"
-      ],
-      "process": "Yellow Honey",
       "roaster": "Moonwake",
       "flavorNotes": [
         "banana bread",
         "almond",
         "pear jam"
       ],
-      "rating": 2,
       "dateTried": "2026-08-25",
-      "altitude": 1510,
       "notes": "Switch. Bitter and tasted over-roasted \"diner style\"",
       "createdAt": "2026-08-25T20:13:46.102Z",
-      "updatedAt": "2026-09-07T16:47:11.339Z"
+      "updatedAt": "2026-09-07T16:47:11.339Z",
+      "ratings": {
+        "RH": 2
+      },
+      "components": [
+        {
+          "country": "HND",
+          "region": "San Jose La Paz, Roberto Rene Gonzalez, Finca Liquidambar",
+          "producer": "",
+          "variety": [
+            "Bourbon",
+            "Catuai",
+            "Pacas"
+          ],
+          "process": "Yellow Honey",
+          "altitude": 1510,
+          "share": null
+        }
+      ]
     }
   ]
 }
