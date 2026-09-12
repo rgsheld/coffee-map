@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-09-09T23:06:47.207Z",
+  "updatedAt": "2026-09-12T21:42:49.889Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -135,6 +135,37 @@
           "share": null
         }
       ]
+    },
+    {
+      "name": "Elida Estate Washed Gesha Lot C",
+      "roaster": "Black and White",
+      "flavorNotes": [
+        "Magnolia",
+        "citrus",
+        "mango",
+        "oolong"
+      ],
+      "ratings": {
+        "RH": 3
+      },
+      "dateTried": "2026-09-12",
+      "notes": "Switch @ 2 weeks",
+      "components": [
+        {
+          "country": "PAN",
+          "region": "Boquete",
+          "producer": "Lamastus Family / Elida Estate",
+          "variety": [
+            "Gesha"
+          ],
+          "process": "Washed",
+          "altitude": 1800,
+          "share": null
+        }
+      ],
+      "id": "c_20260912_tfuksh",
+      "createdAt": "2026-09-12T21:42:49.881Z",
+      "updatedAt": "2026-09-12T21:42:49.881Z"
     }
   ]
 }
