@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-09-12T21:42:49.889Z",
+  "updatedAt": "2026-09-14T18:42:10.632Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -61,6 +61,37 @@
           "share": null
         }
       ]
+    },
+    {
+      "name": "Lychee Peach",
+      "roaster": "Black and White",
+      "flavorNotes": [
+        "White flowers",
+        "lychee gummies",
+        "fruit cocktail",
+        "black tea"
+      ],
+      "ratings": {
+        "RH": 4
+      },
+      "dateTried": "2026-09-14",
+      "notes": "",
+      "components": [
+        {
+          "country": "COL",
+          "region": "Piendamó, Cauca",
+          "producer": "Familia Bermudez / Finca El Paraiso",
+          "variety": [
+            "Castillo"
+          ],
+          "process": "Thermal Shock Washed",
+          "altitude": 1900,
+          "share": null
+        }
+      ],
+      "id": "c_20260914_w2we6r",
+      "createdAt": "2026-09-14T18:42:10.620Z",
+      "updatedAt": "2026-09-14T18:42:10.621Z"
     },
     {
       "id": "c_20260825_ewommo",
@@ -145,11 +176,14 @@
         "mango",
         "oolong"
       ],
+      "dateTried": "2026-09-12",
+      "notes": "Switch @ 2 weeks",
+      "id": "c_20260912_tfuksh",
+      "createdAt": "2026-09-12T21:42:49.881Z",
+      "updatedAt": "2026-09-12T21:42:49.881Z",
       "ratings": {
         "RH": 3
       },
-      "dateTried": "2026-09-12",
-      "notes": "Switch @ 2 weeks",
       "components": [
         {
           "country": "PAN",
@@ -162,10 +196,7 @@
           "altitude": 1800,
           "share": null
         }
-      ],
-      "id": "c_20260912_tfuksh",
-      "createdAt": "2026-09-12T21:42:49.881Z",
-      "updatedAt": "2026-09-12T21:42:49.881Z"
+      ]
     }
   ]
 }
