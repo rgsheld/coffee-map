@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-09-14T18:42:10.632Z",
+  "updatedAt": "2026-09-15T04:32:39.810Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -71,11 +71,15 @@
         "fruit cocktail",
         "black tea"
       ],
-      "ratings": {
-        "RH": 4
-      },
       "dateTried": "2026-09-14",
       "notes": "",
+      "id": "c_20260914_w2we6r",
+      "createdAt": "2026-09-14T18:42:10.620Z",
+      "updatedAt": "2026-09-15T04:32:39.787Z",
+      "ratings": {
+        "RH": 4,
+        "AS": 2.5
+      },
       "components": [
         {
           "country": "COL",
@@ -88,10 +92,7 @@
           "altitude": 1900,
           "share": null
         }
-      ],
-      "id": "c_20260914_w2we6r",
-      "createdAt": "2026-09-14T18:42:10.620Z",
-      "updatedAt": "2026-09-14T18:42:10.621Z"
+      ]
     },
     {
       "id": "c_20260825_ewommo",
