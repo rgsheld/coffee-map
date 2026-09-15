@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-09-15T04:32:39.810Z",
+  "updatedAt": "2026-09-15T14:39:35.326Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -13,9 +13,9 @@
         "earl grey"
       ],
       "dateTried": "2026-09-09",
-      "notes": "Switch @ 2 weeks: some of the earl grey/molasses but not much acidity. Not bitter though.",
+      "notes": "Switch @ 2 weeks: some of the earl grey/molasses but not much acidity. Not bitter though.\n\nChemex @ 4 weeks: very tea like but more oolong",
       "createdAt": "2026-09-09T16:26:52.475Z",
-      "updatedAt": "2026-09-09T23:06:47.205Z",
+      "updatedAt": "2026-09-15T14:39:35.315Z",
       "ratings": {
         "RH": 3
       },
