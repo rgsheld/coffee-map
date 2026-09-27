@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-09-27T14:32:53.920Z",
+  "updatedAt": "2026-09-27T15:18:06.924Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -179,12 +179,12 @@
         "oolong"
       ],
       "dateTried": "2026-09-12",
-      "notes": "Switch @ 2 weeks",
+      "notes": "Switch @ 2 weeks\nSwitch @ 4 weeks: clean flavor",
       "id": "c_20260912_tfuksh",
       "createdAt": "2026-09-12T21:42:49.881Z",
-      "updatedAt": "2026-09-27T14:32:53.239Z",
+      "updatedAt": "2026-09-27T15:18:06.917Z",
       "ratings": {
-        "RH": 3,
+        "RH": 3.5,
         "AS": 4
       },
       "components": [
