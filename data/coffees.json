@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-09-20T16:23:04.993Z",
+  "updatedAt": "2026-09-27T14:32:51.246Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -182,9 +182,9 @@
       "notes": "Switch @ 2 weeks",
       "id": "c_20260912_tfuksh",
       "createdAt": "2026-09-12T21:42:49.881Z",
-      "updatedAt": "2026-09-12T21:42:49.881Z",
+      "updatedAt": "2026-09-27T14:32:51.237Z",
       "ratings": {
-        "RH": 3
+        "RH": 3.5
       },
       "components": [
         {
