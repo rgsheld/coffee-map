@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-10-10T17:23:09.048Z",
+  "updatedAt": "2026-10-10T17:33:27.738Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -227,6 +227,34 @@
           "share": null
         }
       ]
+    },
+    {
+      "name": "Ratnagiri Scoby Jasmine",
+      "roaster": "Driftaway",
+      "flavorNotes": [
+        "Jasmine",
+        "coconut",
+        "lavender"
+      ],
+      "ratings": {},
+      "dateTried": "2026-10-10",
+      "notes": "",
+      "components": [
+        {
+          "country": "IND",
+          "region": "Chikkamagaluru",
+          "producer": "Ashok and Divya Patre / Ratnagiri Estate",
+          "variety": [
+            "Catuai"
+          ],
+          "process": "Culture process",
+          "altitude": null,
+          "share": null
+        }
+      ],
+      "id": "c_20261010_wrnjee",
+      "createdAt": "2026-10-10T17:33:27.733Z",
+      "updatedAt": "2026-10-10T17:33:27.733Z"
     },
     {
       "name": "Elida Estate Washed Gesha Lot C",
