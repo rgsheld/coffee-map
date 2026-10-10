@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-10-10T17:04:03.622Z",
+  "updatedAt": "2026-10-10T17:23:09.048Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -122,6 +122,37 @@
           "share": null
         }
       ]
+    },
+    {
+      "name": "Strawberry Shake",
+      "roaster": "Kos Coffee Roasters",
+      "flavorNotes": [
+        "Fresh strawberries",
+        "peach",
+        "creamy"
+      ],
+      "ratings": {
+        "RH": 2.5
+      },
+      "dateTried": "2026-10-10",
+      "notes": "Aroma is great but strawberry flavor doesnt come through much on switch or chemex",
+      "components": [
+        {
+          "country": "COL",
+          "region": "Quindío",
+          "producer": "Viviana Martinez",
+          "variety": [
+            "Pink bourbon",
+            "castillo"
+          ],
+          "process": "Strawberry co-ferment",
+          "altitude": 1400,
+          "share": null
+        }
+      ],
+      "id": "c_20261010_fib3e4",
+      "createdAt": "2026-10-10T17:23:09.037Z",
+      "updatedAt": "2026-10-10T17:23:09.037Z"
     },
     {
       "id": "c_20260825_ewommo",
