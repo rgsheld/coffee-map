@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-10-10T17:33:27.738Z",
+  "updatedAt": "2026-10-16T14:30:34.509Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -42,11 +42,14 @@
         "Brown Sugar",
         "Sweet Tea"
       ],
+      "dateTried": "2026-10-10",
+      "notes": "",
+      "id": "c_20261010_4krlry",
+      "createdAt": "2026-10-10T17:04:03.602Z",
+      "updatedAt": "2026-10-10T17:04:03.602Z",
       "ratings": {
         "RH": 2
       },
-      "dateTried": "2026-10-10",
-      "notes": "",
       "components": [
         {
           "country": "COL",
@@ -57,10 +60,7 @@
           "altitude": null,
           "share": null
         }
-      ],
-      "id": "c_20261010_4krlry",
-      "createdAt": "2026-10-10T17:04:03.602Z",
-      "updatedAt": "2026-10-10T17:04:03.602Z"
+      ]
     },
     {
       "id": "c_20260825_u7fcpx",
@@ -131,11 +131,14 @@
         "peach",
         "creamy"
       ],
+      "dateTried": "2026-10-10",
+      "notes": "Aroma is great but strawberry flavor doesnt come through much on switch or chemex",
+      "id": "c_20261010_fib3e4",
+      "createdAt": "2026-10-10T17:23:09.037Z",
+      "updatedAt": "2026-10-10T17:23:09.037Z",
       "ratings": {
         "RH": 2.5
       },
-      "dateTried": "2026-10-10",
-      "notes": "Aroma is great but strawberry flavor doesnt come through much on switch or chemex",
       "components": [
         {
           "country": "COL",
@@ -149,10 +152,7 @@
           "altitude": 1400,
           "share": null
         }
-      ],
-      "id": "c_20261010_fib3e4",
-      "createdAt": "2026-10-10T17:23:09.037Z",
-      "updatedAt": "2026-10-10T17:23:09.037Z"
+      ]
     },
     {
       "id": "c_20260825_ewommo",
@@ -236,9 +236,12 @@
         "coconut",
         "lavender"
       ],
-      "ratings": {},
       "dateTried": "2026-10-10",
       "notes": "",
+      "id": "c_20261010_wrnjee",
+      "createdAt": "2026-10-10T17:33:27.733Z",
+      "updatedAt": "2026-10-10T17:33:27.733Z",
+      "ratings": {},
       "components": [
         {
           "country": "IND",
@@ -251,10 +254,7 @@
           "altitude": null,
           "share": null
         }
-      ],
-      "id": "c_20261010_wrnjee",
-      "createdAt": "2026-10-10T17:33:27.733Z",
-      "updatedAt": "2026-10-10T17:33:27.733Z"
+      ]
     },
     {
       "name": "Elida Estate Washed Gesha Lot C",
@@ -287,6 +287,35 @@
           "share": null
         }
       ]
+    },
+    {
+      "name": "El Gobiano",
+      "roaster": "S&W",
+      "flavorNotes": [
+        "mango",
+        "papaya",
+        "nectarine",
+        "cherry"
+      ],
+      "ratings": {},
+      "dateTried": "2026-10-16",
+      "notes": "",
+      "components": [
+        {
+          "country": "SLV",
+          "region": "Ahuachapan",
+          "producer": "Fernando Alfaro / Finca Gobiado",
+          "variety": [
+            "Rainbow Bourbon"
+          ],
+          "process": "Anaerobic Natural",
+          "altitude": 1300,
+          "share": null
+        }
+      ],
+      "id": "c_20261016_rymvbq",
+      "createdAt": "2026-10-16T14:30:34.499Z",
+      "updatedAt": "2026-10-16T14:30:34.499Z"
     }
   ]
 }
