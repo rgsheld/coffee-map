@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-10-17T17:12:39.898Z",
+  "updatedAt": "2026-10-17T17:13:02.475Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -73,7 +73,7 @@
       "dateTried": "2026-08-25",
       "notes": "Switch. Had an odd tannic mouth feel but smooth deep sweetness (@ 2 weeks)",
       "createdAt": "2026-08-25T20:11:38.330Z",
-      "updatedAt": "2026-10-17T17:12:39.883Z",
+      "updatedAt": "2026-10-17T17:13:02.464Z",
       "ratings": {
         "RH": 4
       },
