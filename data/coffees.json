@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updatedAt": "2026-10-16T14:30:34.509Z",
+  "updatedAt": "2026-10-17T16:29:33.681Z",
   "coffees": [
     {
       "id": "c_20260909_i13jdf",
@@ -297,9 +297,14 @@
         "nectarine",
         "cherry"
       ],
-      "ratings": {},
       "dateTried": "2026-10-16",
-      "notes": "",
+      "notes": "4 weeks post roast: Tried pour over and switch from 22 to 18 clicks on the grinder and 1:15 to 1:16.5. All still bitter, not much fruit flavor.",
+      "id": "c_20261016_rymvbq",
+      "createdAt": "2026-10-16T14:30:34.499Z",
+      "updatedAt": "2026-10-17T16:29:33.672Z",
+      "ratings": {
+        "RH": 1.5
+      },
       "components": [
         {
           "country": "SLV",
@@ -312,10 +317,7 @@
           "altitude": 1300,
           "share": null
         }
-      ],
-      "id": "c_20261016_rymvbq",
-      "createdAt": "2026-10-16T14:30:34.499Z",
-      "updatedAt": "2026-10-16T14:30:34.499Z"
+      ]
     }
   ]
 }
